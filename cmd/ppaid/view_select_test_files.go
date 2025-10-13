@@ -103,7 +103,6 @@ func (t *selectTestFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) 
 			t.filteredChoices = fuzzy.Find(t.searchInput.Value(), t.choices)
 			t.cursor = 0
 			return m, cmd
-
 		}
 	}
 

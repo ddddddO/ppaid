@@ -83,8 +83,8 @@ func (m model) View() string {
 		if len(m.selectCoverageFilesView.selected) == 0 {
 			sb.WriteString("  (no selected)\n")
 		} else {
-			for i := range m.selectCoverageFilesView.selected {
-				sb.WriteString(fmt.Sprintf("  - %s\n", m.selectCoverageFilesView.choices[i]))
+			for choice := range m.selectCoverageFilesView.selected {
+				sb.WriteString(fmt.Sprintf("  - %s\n", choice))
 			}
 		}
 

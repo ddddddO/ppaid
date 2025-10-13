@@ -2,14 +2,21 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/sahilm/fuzzy"
 )
 
 type selectCoverageFilesView struct {
-	choices  []string
-	cursor   int
-	selected map[int]struct{}
+	choices         []string      // 選択肢のリスト
+	filteredChoices []fuzzy.Match // 絞り込まれた選択肢のリスト
+
+	cursor      int
+	searchInput textinput.Model
+
+	selected map[string]struct{}
 }
 
 func newSelectCoverageFilesView() (*selectCoverageFilesView, error) {
@@ -18,95 +25,132 @@ func newSelectCoverageFilesView() (*selectCoverageFilesView, error) {
 		return nil, err
 	}
 
+	ti := textinput.New()
+	ti.Placeholder = "Filter coverage target files..."
+	ti.Focus()
+	ti.CharLimit = 156
+	ti.Width = 20
+
 	// TODO: 多分ここで、選択されたカバレッジ取りたいファイルパスをマージして、最大公約数的なパスを算出して以下に設定できればよさそうな気がする？
 	// - pcov.directory=
 	// - phpunit.xmlの <coverage> or <source> or <filter> ...?
 
 	return &selectCoverageFilesView{
-		choices:  paths,
-		selected: make(map[int]struct{}),
+		choices:         paths,
+		filteredChoices: fuzzy.Find("", paths),
+		selected:        make(map[string]struct{}),
+		searchInput:     ti,
 	}, nil
 }
 
 func (t *selectCoverageFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
-
-	// Is it a key press?
 	case tea.KeyMsg:
-
-		// Cool, what was the actual key pressed?
 		switch msg.String() {
-
-		// These keys should exit the program.
-		// case "ctrl+c", "q":
-		// 	return t, tea.Quit
-
-		// The "up" and "k" keys move the cursor up
 		case "up", "k":
 			if t.cursor > 0 {
 				t.cursor--
 			}
 
-		// The "down" and "j" keys move the cursor down
+			t.searchInput, cmd = t.searchInput.Update(msg)
+			return m, cmd
+
 		case "down", "j":
-			if t.cursor < len(t.choices)-1 {
+			// 検索が空っぽの時
+			if len(strings.TrimSpace(t.searchInput.Value())) == 0 {
+				if t.cursor < len(t.choices)-1 {
+					t.cursor++
+				}
+			}
+
+			if t.cursor < len(t.filteredChoices)-1 {
 				t.cursor++
 			}
 
+			t.searchInput, cmd = t.searchInput.Update(msg)
+			return m, cmd
+
 		// spaceで選択・選択解除
 		case " ":
-			_, ok := t.selected[t.cursor]
-			if ok {
-				delete(t.selected, t.cursor)
-			} else {
-				t.selected[t.cursor] = struct{}{}
+			// 検索が空っぽの時
+			if len(strings.TrimSpace(t.searchInput.Value())) == 0 {
+				choice := t.choices[t.cursor]
+				_, ok := t.selected[choice]
+				if ok {
+					delete(t.selected, choice)
+				} else {
+					t.selected[choice] = struct{}{}
+				}
 			}
 
-		// TODO: Enterで次に行きたい
+			if len(t.filteredChoices) > 0 {
+				choice := t.filteredChoices[t.cursor].Str
+				if _, ok := t.selected[choice]; ok {
+					delete(t.selected, choice)
+				} else {
+					t.selected[choice] = struct{}{}
+				}
+			}
+
+			// スペースで選択するため、検索窓への入力でスペースは許容しない
+			// t.searchInput, cmd = t.searchInput.Update(msg)
+			return m, nil
+
 		case "enter":
-			// choiced := []string{}
-			// for i := range t.selected {
-			// 	choiced = append(choiced, t.choices[i])
-			// }
-
-			// fmt.Printf("Result2: %+v\n", choiced)
-
 			m.quitting = true
 			return m, tea.Quit
+
+		default:
+			t.searchInput, cmd = t.searchInput.Update(msg)
+			t.filteredChoices = fuzzy.Find(t.searchInput.Value(), t.choices)
+			t.cursor = 0
+			return m, cmd
 		}
 	}
 
+	t.searchInput, cmd = t.searchInput.Update(msg)
+
 	// Return the updated model to the Bubble Tea runtime for processing.
 	// Note that we're not returning a command.
-	return m, nil
+	return m, cmd
 }
 
 func (t *selectCoverageFilesView) view() string {
-	// The header
-	s := "Select target files you want to coverage (press Space)\n\n"
+	var sb strings.Builder
+	sb.WriteString("Select target files you want to coverage (press Space)\n\n")
+	sb.WriteString(t.searchInput.View())
+	sb.WriteString("\n\n")
 
-	// Iterate over our choices
-	for i, choice := range t.choices {
+	// t.filteredChoices は、fuzzy.Findの第一引数が空文字だとマッチしない。検索文字列が空なら全権表示するようにするため以下の処理
+	matchs := []string{}
+	if len(strings.TrimSpace(t.searchInput.Value())) == 0 {
+		matchs = t.choices
+	} else {
+		for _, m := range t.filteredChoices {
+			matchs = append(matchs, m.Str)
+		}
+	}
 
-		// Is the cursor pointing at this choice?
+	for i, match := range matchs {
 		cursor := " " // no cursor
 		if t.cursor == i {
 			cursor = ">" // cursor!
 		}
 
-		// Is this choice selected?
 		checked := " " // not selected
-		if _, ok := t.selected[i]; ok {
+		if _, ok := t.selected[match]; ok {
 			checked = "x" // selected!
 		}
 
 		// Render the row
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		sb.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, match))
 	}
 
 	// The footer
-	s += "\nPress q to quit.\n"
+	sb.WriteString("\n(↑↓: move, Space: select, Enter: next, q: quit)\n")
 
 	// Send the UI for rendering
-	return s
+	return sb.String()
 }
