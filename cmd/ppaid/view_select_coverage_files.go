@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -100,6 +101,17 @@ func (t *selectCoverageFilesView) update(msg tea.Msg, m model) (tea.Model, tea.C
 
 		case "enter":
 			m.quitting = true
+
+			// TODO: 一旦ここに置くだけ
+			targetTests := []string{}
+			for s := range m.selectTestFilesView.selected {
+				targetTests = append(targetTests, filepath.Join("./tests", s))
+			}
+
+			if err := generatePHPUnitXML(targetTests); err != nil {
+				panic(err)
+			}
+
 			return m, tea.Quit
 
 		default:
