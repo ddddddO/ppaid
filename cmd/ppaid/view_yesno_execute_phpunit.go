@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
+	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,11 +12,14 @@ type yesnoView struct {
 	cursor   int
 	choices  []string
 	selected string
+
+	cmdPHPUnit *cmdPHPUnit
 }
 
 func newYesNoView() (*yesnoView, error) {
 	return &yesnoView{
-		choices: []string{"Yes", "No"},
+		choices:    []string{"Yes", "No"},
+		cmdPHPUnit: &cmdPHPUnit{},
 	}, nil
 }
 
@@ -28,21 +31,30 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
-			m.quitting = true
 			v.selected = v.choices[v.cursor]
 
 			if v.selected == "Yes" {
 				// TODO: 一旦ここに置くだけ
-				targetTests := []string{}
-				for s := range m.selectTestFilesView.selected {
-					targetTests = append(targetTests, filepath.Join("./tests", s))
-				}
-
-				if err := generatePHPUnitXML(targetTests); err != nil {
+				if err := os.RemoveAll(outputCoverageDir); err != nil {
 					panic(err)
 				}
+				if err := os.Remove("tmp_phpunit.xml"); err != nil {
+					panic(err)
+				}
+
+				targetTests := []string{}
+				for s := range m.selectTestFilesView.selected {
+					targetTests = append(targetTests, s)
+				}
+
+				if err := generatePHPUnitXML(targetTests, m.selectCoverageFilesView.longestMatchDirPath()); err != nil {
+					panic(err)
+				}
+
+				return m, v.cmdPHPUnit.command()
 			}
 
+			m.quitting = true
 			return m, tea.Quit
 
 		case "down", "j":
@@ -62,15 +74,14 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-const EXEC_PHPUNIT = `php -d pcov.directory=%s vendor/bin/phpunit --testsuite "%s" --configuration %s --coverage-html coverage`
-
-func (v *yesnoView) view() string {
+func (v *yesnoView) view(cfv *selectCoverageFilesView) string {
 	s := strings.Builder{}
 	s.WriteString("Execute PHPUnit?\n\n")
 
-	execCmd := fmt.Sprintf(EXEC_PHPUNIT, "./src", "PPAID", "tmp_phpunit.xml")
+	// v.cmdPHPUnit.build("./src", "PPAID", "tmp_phpunit.xml")
+	v.cmdPHPUnit.build(cfv.longestMatchDirPath(), "PPAID", "tmp_phpunit.xml")
 
-	s.WriteString(fmt.Sprintf("%s\n\n", execCmd))
+	s.WriteString(fmt.Sprintf("%s\n\n", v.cmdPHPUnit.rawCmd()))
 
 	for i := 0; i < len(v.choices); i++ {
 		if v.cursor == i {

@@ -59,13 +59,17 @@ func getPHPFilePaths(targetDir string, ignore []string) ([]string, error) {
 			return nil
 		}
 
-		relativePath, err := filepath.Rel(target, path)
+		relativePath, err := filepath.Rel(root, path)
 		if err != nil {
 			return err
 		}
 
 		if d.IsDir() && slices.Contains(ignore, d.Name()) {
 			return fs.SkipDir
+		}
+
+		if !d.IsDir() && filepath.Ext(relativePath) != ".php" {
+			return nil
 		}
 
 		paths = append(paths, relativePath)

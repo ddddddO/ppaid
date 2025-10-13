@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -153,4 +154,53 @@ func (t *selectCoverageFilesView) view() string {
 
 	// Send the UI for rendering
 	return sb.String()
+}
+
+// 選択されたカバレッジ取りたいPHPファイルのパスの最大公約数的なディレクトリのパスを返す
+func (t *selectCoverageFilesView) longestMatchDirPath() string {
+	if len(t.selected) == 0 {
+		return "./"
+	}
+
+	segments := make([][]string, len(t.selected))
+	i := 0
+	for p := range t.selected {
+		dirPath := filepath.Dir(p)
+		cleanedPath := filepath.Clean(dirPath)
+		segments[i] = strings.Split(cleanedPath, string(filepath.Separator))
+		i++
+	}
+	minLen := len(segments[0])
+	for i := 1; i < len(segments); i++ {
+		if len(segments[i]) < minLen {
+			minLen = len(segments[i])
+		}
+	}
+
+	commonSegments := []string{}
+	firstSegments := segments[0]
+	for i := 0; i < minLen; i++ {
+		currentSegment := firstSegments[i]
+		isCommon := true
+
+		for j := 1; j < len(segments); j++ {
+			if segments[j][i] != currentSegment {
+				isCommon = false
+				break
+			}
+		}
+
+		if isCommon {
+			commonSegments = append(commonSegments, currentSegment)
+		} else {
+			// 一致しない要素が現れたら、そこで終了
+			break
+		}
+	}
+
+	if len(commonSegments) == 0 {
+		return "./"
+	}
+
+	return filepath.Join(commonSegments...)
 }

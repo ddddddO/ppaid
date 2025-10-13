@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -9,6 +11,7 @@ const (
 	ViewOfSelectTestFiles = iota
 	ViewOfSelectCoverageFiles
 	ViewOfYesNo
+	ViewOfCoverageList
 )
 
 type model struct {
@@ -18,6 +21,9 @@ type model struct {
 	selectTestFilesView     *selectTestFilesView
 	selectCoverageFilesView *selectCoverageFilesView
 	yesnoView               *yesnoView
+	coverageListView        *coverageListView
+
+	err error
 }
 
 func initialModel() (model, error) {
@@ -36,12 +42,15 @@ func initialModel() (model, error) {
 		return model{}, err
 	}
 
+	clv := newCoverageListView()
+
 	return model{
 		currentView: ViewOfSelectTestFiles,
 
 		selectTestFilesView:     tfv,
 		selectCoverageFilesView: cfv,
 		yesnoView:               ynv,
+		coverageListView:        clv,
 	}, nil
 }
 
@@ -57,6 +66,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		}
+	case phpnuitFinishedMsg:
+		if msg.err != nil {
+			m.err = msg.err
+			m.quitting = true
+			return m, tea.Quit
+		}
+
+		m.currentView = ViewOfCoverageList
+		return m, nil
+
 	}
 
 	switch m.currentView {
@@ -66,6 +85,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.selectCoverageFilesView.update(msg, m)
 	case ViewOfYesNo:
 		return m.yesnoView.update(msg, m)
+	case ViewOfCoverageList:
+		return m.coverageListView.update(msg, m)
 	default:
 		return m, nil
 	}
@@ -99,13 +120,19 @@ func (m model) View() string {
 		return "end"
 	}
 
+	if m.err != nil {
+		return fmt.Sprintf("failed...: \n%v\n", m.err)
+	}
+
 	switch m.currentView {
 	case ViewOfSelectTestFiles:
 		return m.selectTestFilesView.view()
 	case ViewOfSelectCoverageFiles:
 		return m.selectCoverageFilesView.view()
 	case ViewOfYesNo:
-		return m.yesnoView.view()
+		return m.yesnoView.view(m.selectCoverageFilesView)
+	case ViewOfCoverageList:
+		return m.coverageListView.view()
 	default:
 		return "unknown view"
 	}
