@@ -10,6 +10,8 @@ import (
 )
 
 type selectTestFilesView struct {
+	height int
+
 	choices         []string      // 選択肢のリスト
 	filteredChoices []fuzzy.Match // 絞り込まれた選択肢のリスト
 
@@ -32,6 +34,7 @@ func newSelectTestFilesView() (*selectTestFilesView, error) {
 	ti.Width = 20
 
 	return &selectTestFilesView{
+		height:          4,
 		choices:         paths,
 		filteredChoices: fuzzy.Find("", paths),
 		selected:        make(map[string]struct{}),
@@ -43,6 +46,8 @@ func (t *selectTestFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) 
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		t.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "up", "k":
@@ -129,7 +134,11 @@ func (t *selectTestFilesView) view() string {
 		}
 	}
 
-	for i, match := range matchs {
+	// マイナスしてるのは、パス一覧を除いた高さを一旦決め打ちした数
+	height := min(len(matchs), t.height-7)
+	height = max(0, height) // 起動時、heightがマイナス値になることあってパニックになるから
+
+	for i, match := range matchs[:height] {
 		cursor := " " // no cursor
 		if t.cursor == i {
 			cursor = ">" // cursor!
@@ -142,6 +151,9 @@ func (t *selectTestFilesView) view() string {
 
 		// Render the row
 		sb.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, match))
+	}
+	if len(matchs) > height {
+		sb.WriteString(fmt.Sprintf("  ... %d more", len(matchs)-height))
 	}
 
 	// The footer
