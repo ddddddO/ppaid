@@ -17,6 +17,19 @@ Files located in `tests/` directory.
 ## What files can be selected to get coverage?
 Files located in `src/` or `app/` directory.
 
+## Install
+
+### Homebrew
+
+```console
+brew install ddddddO/tap/ppaid
+```
+
+### Go
+```console
+go install github.com/ddddddO/ppaid/cmd/ppaid@latest
+```
+
 ## Processing of PP-Aid
 todo: 英語もほしい
 
