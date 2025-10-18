@@ -1,11 +1,13 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal"
 	"github.com/ddddddO/ppaid/internal/command"
 	"github.com/ddddddO/ppaid/internal/phpunitxml"
 )
@@ -85,13 +87,26 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (v *yesnoView) view(cfv *selectCoverageFilesView) string {
+func (v *yesnoView) view(width int, cfv *selectCoverageFilesView) string {
 	s := strings.Builder{}
-	s.WriteString("Execute PHPUnit?\n\n")
+	s.WriteString(fmt.Sprintf("%s\n\n", internal.ColorLightPinkStyle.Render("Execute PHPUnit?")))
 
 	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PPAID", phpunitxml.OutputPHPUnitXML)
 
-	s.WriteString(fmt.Sprintf("%s\n\n", v.cmdPHPUnit.RawCmd()))
+	rawCmd := v.cmdPHPUnit.RawCmd()
+	if len(rawCmd) <= width {
+		s.WriteString(fmt.Sprintf("%s\n\n", internal.ColorBrightGreenStyle.Render(rawCmd)))
+	} else {
+		// ターミナルの横幅より長いコマンドを改行して表示するため
+		splited, err := splitStringByN(rawCmd, width)
+		if err != nil {
+			panic(err)
+		}
+		for i := range splited {
+			s.WriteString(fmt.Sprintf("%s\n", internal.ColorBrightGreenStyle.Render(splited[i])))
+		}
+		s.WriteString("\n")
+	}
 
 	for i := 0; i < len(v.choices); i++ {
 		if v.cursor == i {
@@ -105,4 +120,26 @@ func (v *yesnoView) view(cfv *selectCoverageFilesView) string {
 	s.WriteString("\n(press q to quit)\n")
 
 	return s.String()
+}
+
+func splitStringByN(s string, n int) ([]string, error) {
+	if n <= 0 {
+		return nil, errors.New("require n is upper 0")
+	}
+
+	runes := []rune(s)
+	var chunks []string
+	for i := 0; i < len(runes); i += n {
+		start := i
+		end := i + n
+
+		if end > len(runes) {
+			end = len(runes)
+		}
+
+		chunk := string(runes[start:end])
+		chunks = append(chunks, chunk)
+	}
+
+	return chunks, nil
 }

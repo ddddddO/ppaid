@@ -116,7 +116,7 @@ func (t *selectTestFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) 
 
 func (t *selectTestFilesView) view(viewHeight int) string {
 	var sb strings.Builder
-	sb.WriteString("Select the test files you want to run (press Space)\n\n")
+	sb.WriteString(fmt.Sprintf("%s\n\n", internal.ColorLightPinkStyle.Render("Select test files you want to run (press Space)")))
 	sb.WriteString(t.searchInput.View())
 	sb.WriteString("\n\n")
 
@@ -135,18 +135,21 @@ func (t *selectTestFilesView) view(viewHeight int) string {
 	height = max(0, height) // 起動時、heightがマイナス値になることあってパニックになるから
 
 	for i, match := range matchs[:height] {
+		coloredMatch := match
 		cursor := " " // no cursor
 		if t.cursor == i {
 			cursor = ">" // cursor!
+			coloredMatch = internal.ColorBrightGreenStyle.Render(match)
 		}
 
 		checked := " " // not selected
 		if _, ok := t.selected[match]; ok {
 			checked = "x" // selected!
+			coloredMatch = internal.ColorBrightBlueStyle.Render(match)
 		}
 
 		// Render the row
-		sb.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, match))
+		sb.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, coloredMatch))
 	}
 	if len(matchs) > height {
 		sb.WriteString(fmt.Sprintf("  ... %d more", len(matchs)-height))

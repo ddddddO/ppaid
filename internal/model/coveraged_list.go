@@ -49,7 +49,7 @@ func (c *coveragedListView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 func (c *coveragedListView) view(viewHeight int) string {
 	s := &strings.Builder{}
 	lvl := 2
-	s.WriteString(fmt.Sprintf("\n\n--- Cveraged file list (Max depth: %d) ---\n\n", lvl+1))
+	s.WriteString(fmt.Sprintf("\n\n%s\n\n", internal.ColorLightPinkStyle.Render(fmt.Sprintf("===== Cveraged file list (Max depth: %d) =====", lvl+1))))
 
 	coverages, err := internal.GetCoveragedFilePaths(lvl)
 	if err != nil {
