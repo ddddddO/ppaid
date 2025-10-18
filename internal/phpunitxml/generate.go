@@ -1,24 +1,44 @@
 package phpunitxml
 
 import (
+	"fmt"
 	"os"
 	"text/template"
+
+	"github.com/ddddddO/ppaid/internal/command"
 )
 
+const OutputPHPUnitXML = "phpunitxml_generated_by_ppaid.xml"
+
+type phpunitXMLData struct {
+	TestSuiteName     string
+	TargetTestFiles   []string
+	TargetCoverageDir string
+}
+
 func Generate(targetTests []string, targetCoverageDir string) error {
-	d := &phpunitXMLv11Data{
-		TestSuiteName:     "PPAID",
-		TargetTestFiles:   targetTests,
-		TargetCoverageDir: targetCoverageDir,
+	majorVersion, err := command.ParsePHPUnitVersion()
+	if err != nil {
+		return err
 	}
 
-	t := template.Must(template.New("xxx").Parse(phpunitXMLv11Template))
+	var t *template.Template
+	switch majorVersion {
+	case 11:
+		t = template.Must(template.New("xxx").Parse(phpunitXMLv11Template))
+	default:
+		return fmt.Errorf("unsupported PHPUnit version: %d", majorVersion)
+	}
 
-	f, err := os.Create("tmp_phpunit.xml")
+	f, err := os.Create(OutputPHPUnitXML)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	return t.Execute(f, d)
+	return t.Execute(f, &phpunitXMLData{
+		TestSuiteName:     "PPAID",
+		TargetTestFiles:   targetTests,
+		TargetCoverageDir: targetCoverageDir,
+	})
 }

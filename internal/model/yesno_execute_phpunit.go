@@ -40,8 +40,14 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				if err := os.RemoveAll(command.OutputCoverageDir); err != nil {
 					panic(err)
 				}
-				if err := os.Remove("tmp_phpunit.xml"); err != nil {
-					panic(err)
+				if _, err := os.Stat(phpunitxml.OutputPHPUnitXML); err == nil {
+					if e := os.Remove(phpunitxml.OutputPHPUnitXML); e != nil {
+						panic(e)
+					}
+				} else {
+					if !os.IsNotExist(err) {
+						panic(err)
+					}
 				}
 
 				targetTests := []string{}
@@ -80,8 +86,7 @@ func (v *yesnoView) view(cfv *selectCoverageFilesView) string {
 	s := strings.Builder{}
 	s.WriteString("Execute PHPUnit?\n\n")
 
-	// v.cmdPHPUnit.build("./src", "PPAID", "tmp_phpunit.xml")
-	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PPAID", "tmp_phpunit.xml")
+	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PPAID", phpunitxml.OutputPHPUnitXML)
 
 	s.WriteString(fmt.Sprintf("%s\n\n", v.cmdPHPUnit.RawCmd()))
 

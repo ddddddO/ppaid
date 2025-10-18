@@ -22,7 +22,7 @@ type model struct {
 	selectTestFilesView     *selectTestFilesView
 	selectCoverageFilesView *selectCoverageFilesView
 	yesnoView               *yesnoView
-	coverageListView        *coverageListView
+	coverageListView        *coveragedListView
 
 	err error
 }

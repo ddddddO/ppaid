@@ -1,12 +1,5 @@
 package phpunitxml
 
-// PHPUnit version11用
-type phpunitXMLv11Data struct {
-	TestSuiteName     string
-	TargetTestFiles   []string
-	TargetCoverageDir string
-}
-
 const phpunitXMLv11Template = `<?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"

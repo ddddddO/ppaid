@@ -11,14 +11,14 @@ import (
 	"github.com/ddddddO/ppaid/internal/command"
 )
 
-type coverageListView struct {
+type coveragedListView struct {
 }
 
-func newCoverageListView() *coverageListView {
-	return &coverageListView{}
+func newCoverageListView() *coveragedListView {
+	return &coveragedListView{}
 }
 
-func (c *coverageListView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
+func (c *coveragedListView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -46,10 +46,10 @@ func (c *coverageListView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	return m, tea.Quit
 }
 
-func (c *coverageListView) view() string {
+func (c *coveragedListView) view() string {
 	s := &strings.Builder{}
 	lvl := 2
-	s.WriteString(fmt.Sprintf("\n\n--- Cverage list (Max depth: %d) ---\n\n", lvl+1))
+	s.WriteString(fmt.Sprintf("\n\n--- Cveraged file list (Max depth: %d) ---\n\n", lvl+1))
 
 	coverages, err := internal.GetCoveragedFilePaths(lvl)
 	if err != nil {
@@ -72,8 +72,12 @@ func (c *coverageListView) view() string {
 		if err != nil {
 			panic(err)
 		}
-		// s.WriteString(fmt.Sprintln(iter.Path()))
-		s.WriteString(fmt.Sprintln(iter.Row()))
+
+		if iter.Level() == 1 {
+			s.WriteString(fmt.Sprintf("%s\n", iter.Row()))
+			continue
+		}
+		s.WriteString(fmt.Sprintf("  %s\n", iter.Row()))
 	}
 	s.WriteString("\n")
 
