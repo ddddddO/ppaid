@@ -1,2 +1,3 @@
-# 💊ppaid
-Tool that aids PHPUnit and PCOV 
+# 💊PP-Aid
+Tool that **aid**s **P**HPUnit and **P**COV (pronounced /piːpiːeɪd/)
+

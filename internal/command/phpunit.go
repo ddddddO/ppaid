@@ -23,11 +23,14 @@ type CmdPHPUnit struct {
 
 const OutputCoverageDir = "coverage-ppaid"
 
+// TODO: test/coverage以外の、-d memory_limit指定は、設定ファイルから受け取るようにする
 func (c *CmdPHPUnit) Build(targetCoverageDir string, testSuiteName string, configFile string) {
 	if len(c.CommandToSpecifyBeforePHPCommand) == 0 {
 		c.cmd = exec.Command("php", []string{
 			"-d",
 			fmt.Sprintf("pcov.directory=%s", targetCoverageDir), // ここカンマ区切りで複数指定可能のようだけど、どうもうまくいってない。なので、最大公約数的なパスを一旦指定しておく
+			"-d",
+			fmt.Sprintf("memory_limit=%s", "512M"),
 			"vendor/bin/phpunit",
 			"--testsuite",
 			testSuiteName,
@@ -46,6 +49,8 @@ func (c *CmdPHPUnit) Build(targetCoverageDir string, testSuiteName string, confi
 			"php",
 			"-d",
 			fmt.Sprintf("pcov.directory=%s", targetCoverageDir),
+			"-d",
+			fmt.Sprintf("memory_limit=%s", "512M"),
 			"vendor/bin/phpunit",
 			"--testsuite",
 			testSuiteName,
@@ -62,6 +67,8 @@ func (c *CmdPHPUnit) Build(targetCoverageDir string, testSuiteName string, confi
 		"php",
 		"-d",
 		fmt.Sprintf("pcov.directory=%s", targetCoverageDir),
+		"-d",
+		fmt.Sprintf("memory_limit=%s", "512M"),
 		"vendor/bin/phpunit",
 		"--testsuite",
 		testSuiteName,
