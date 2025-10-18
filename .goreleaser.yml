@@ -1,0 +1,49 @@
+version: 2
+project_name: ppaid
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - main: ./cmd/ppaid
+    binary: ppaid
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Revision={{.ShortCommit}}
+    goos:
+      - darwin
+      - windows
+    env:
+      - CGO_ENABLED=0
+  - id: ppaid-linux
+    main: ./cmd/ppaid
+    binary: ppaid
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Revision={{.ShortCommit}}
+    goos:
+      - linux
+    env:
+      - CGO_ENABLED=0
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - CREDITS
+release:
+  prerelease: auto
+brews:
+  - repository:
+      owner: ddddddO
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/ddddddO/ppaid"
+    description: "Tool that aids PHPUnit and PCOV"
+    license: "BSD-2-Clause"
