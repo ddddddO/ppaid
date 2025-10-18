@@ -1,0 +1,31 @@
+package phpunitxml
+
+const phpunitXMLv9Template = `<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+>
+    <coverage>
+        <include>
+	        <directory suffix=".php">{{.TargetCoverageDir}}</directory>
+        </include>
+        <exclude>
+            <directory>./vendor</directory>
+        </exclude>
+    </coverage>
+
+    <testsuites>
+        <testsuite name="{{.TestSuiteName}}">
+{{range .TargetTestFiles}}            <file>{{.}}</file>
+{{end}}        </testsuite>
+    </testsuites>
+</phpunit>
+`

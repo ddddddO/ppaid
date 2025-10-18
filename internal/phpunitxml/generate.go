@@ -24,6 +24,8 @@ func Generate(targetTests []string, targetCoverageDir string) error {
 
 	var t *template.Template
 	switch majorVersion {
+	case 9:
+		t = template.Must(template.New("xxx").Parse(phpunitXMLv9Template))
 	case 11:
 		t = template.Must(template.New("xxx").Parse(phpunitXMLv11Template))
 	default:
