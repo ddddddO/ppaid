@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -21,7 +22,7 @@ type selectCoverageFilesView struct {
 }
 
 func newSelectCoverageFilesView() (*selectCoverageFilesView, error) {
-	paths, err := getPHPCodeFilePaths()
+	paths, err := internal.GetPHPCodeFilePaths()
 	if err != nil {
 		return nil, err
 	}

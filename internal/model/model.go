@@ -1,10 +1,11 @@
-package main
+package model
 
 import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal/command"
 )
 
 const (
@@ -26,7 +27,7 @@ type model struct {
 	err error
 }
 
-func initialModel() (model, error) {
+func New() (model, error) {
 	tfv, err := newSelectTestFilesView()
 	if err != nil {
 		return model{}, err
@@ -66,9 +67,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		}
-	case phpnuitFinishedMsg:
-		if msg.err != nil {
-			m.err = msg.err
+	case command.PHPUitFinishedMsg:
+		if msg.Err() != nil {
+			m.err = msg.Err()
 			m.quitting = true
 			return m, tea.Quit
 		}

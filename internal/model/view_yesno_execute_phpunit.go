@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal/command"
+	"github.com/ddddddO/ppaid/internal/phpunitxml"
 )
 
 type yesnoView struct {
@@ -13,13 +15,13 @@ type yesnoView struct {
 	choices  []string
 	selected string
 
-	cmdPHPUnit *cmdPHPUnit
+	cmdPHPUnit *command.CmdPHPUnit
 }
 
 func newYesNoView() (*yesnoView, error) {
 	return &yesnoView{
 		choices:    []string{"Yes", "No"},
-		cmdPHPUnit: &cmdPHPUnit{},
+		cmdPHPUnit: &command.CmdPHPUnit{},
 	}, nil
 }
 
@@ -35,7 +37,7 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 
 			if v.selected == "Yes" {
 				// TODO: 一旦ここに置くだけ
-				if err := os.RemoveAll(outputCoverageDir); err != nil {
+				if err := os.RemoveAll(command.OutputCoverageDir); err != nil {
 					panic(err)
 				}
 				if err := os.Remove("tmp_phpunit.xml"); err != nil {
@@ -47,11 +49,11 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					targetTests = append(targetTests, s)
 				}
 
-				if err := generatePHPUnitXML(targetTests, m.selectCoverageFilesView.longestMatchDirPath()); err != nil {
+				if err := phpunitxml.Generate(targetTests, m.selectCoverageFilesView.longestMatchDirPath()); err != nil {
 					panic(err)
 				}
 
-				return m, v.cmdPHPUnit.command()
+				return m, v.cmdPHPUnit.Command()
 			}
 
 			m.quitting = true
@@ -79,9 +81,9 @@ func (v *yesnoView) view(cfv *selectCoverageFilesView) string {
 	s.WriteString("Execute PHPUnit?\n\n")
 
 	// v.cmdPHPUnit.build("./src", "PPAID", "tmp_phpunit.xml")
-	v.cmdPHPUnit.build(cfv.longestMatchDirPath(), "PPAID", "tmp_phpunit.xml")
+	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PPAID", "tmp_phpunit.xml")
 
-	s.WriteString(fmt.Sprintf("%s\n\n", v.cmdPHPUnit.rawCmd()))
+	s.WriteString(fmt.Sprintf("%s\n\n", v.cmdPHPUnit.RawCmd()))
 
 	for i := 0; i < len(v.choices); i++ {
 		if v.cursor == i {

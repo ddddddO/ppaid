@@ -1,9 +1,4 @@
-package main
-
-import (
-	"os"
-	"text/template"
-)
+package phpunitxml
 
 // PHPUnit version11用
 type phpunitXMLv11Data struct {
@@ -34,21 +29,3 @@ const phpunitXMLv11Template = `<?xml version="1.0" encoding="UTF-8"?>
     </testsuites>
 </phpunit>
 `
-
-func generatePHPUnitXML(targetTests []string, targetCoverageDir string) error {
-	d := &phpunitXMLv11Data{
-		TestSuiteName:     "PPAID",
-		TargetTestFiles:   targetTests,
-		TargetCoverageDir: targetCoverageDir,
-	}
-
-	t := template.Must(template.New("xxx").Parse(phpunitXMLv11Template))
-
-	f, err := os.Create("tmp_phpunit.xml")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	return t.Execute(f, d)
-}

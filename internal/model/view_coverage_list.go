@@ -1,15 +1,14 @@
-package main
+package model
 
 import (
 	"fmt"
-	"io/fs"
-	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/ddddddO/gtree"
+	"github.com/ddddddO/ppaid/internal"
+	"github.com/ddddddO/ppaid/internal/command"
 )
 
 type coverageListView struct {
@@ -52,12 +51,12 @@ func (c *coverageListView) view() string {
 	lvl := 2
 	s.WriteString(fmt.Sprintf("\n\n--- Cverage list (Max depth: %d) ---\n\n", lvl+1))
 
-	coverages, err := getCoverageList(lvl)
+	coverages, err := internal.GetCoveragedFilePaths(lvl)
 	if err != nil {
 		panic(err)
 	}
 
-	root := gtree.NewRoot(outputCoverageDir)
+	root := gtree.NewRoot(command.OutputCoverageDir)
 	var node *gtree.Node
 	for i := range coverages {
 		for i, name := range strings.Split(coverages[i], string(filepath.Separator)) {
@@ -82,48 +81,4 @@ func (c *coverageListView) view() string {
 	s.WriteString("If it is not finished, press any key to finish it...")
 
 	return s.String()
-}
-
-func getCoverageList(level int) ([]string, error) {
-	ignore := []string{"_css", "_icons", "_js"}
-
-	root, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-
-	target := filepath.Join(root, outputCoverageDir)
-
-	paths := []string{}
-	err = filepath.WalkDir(target, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if path == root {
-			return nil
-		}
-
-		relativePath, err := filepath.Rel(root, path)
-		if err != nil {
-			return err
-		}
-
-		lvl := strings.Count(relativePath, string(filepath.Separator))
-		if lvl > level {
-			return nil
-		}
-
-		if d.IsDir() && slices.Contains(ignore, d.Name()) {
-			return fs.SkipDir
-		}
-
-		paths = append(paths, relativePath)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return paths, nil
 }

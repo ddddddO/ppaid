@@ -1,4 +1,4 @@
-package main
+package command
 
 import (
 	"fmt"
@@ -7,19 +7,21 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-const EXEC_PHPUNIT = `php -d pcov.directory=%s vendor/bin/phpunit --testsuite "%s" --configuration %s --coverage-html coverage`
-
-type phpnuitFinishedMsg struct {
+type PHPUitFinishedMsg struct {
 	err error
 }
 
-type cmdPHPUnit struct {
+func (p PHPUitFinishedMsg) Err() error {
+	return p.err
+}
+
+type CmdPHPUnit struct {
 	cmd *exec.Cmd
 }
 
-const outputCoverageDir = "coverage-ppaid"
+const OutputCoverageDir = "coverage-ppaid"
 
-func (c *cmdPHPUnit) build(targetCoverageDir string, testSuiteName string, configFile string) {
+func (c *CmdPHPUnit) Build(targetCoverageDir string, testSuiteName string, configFile string) {
 	c.cmd = exec.Command("php", []string{
 		"-d",
 		fmt.Sprintf("pcov.directory=%s", targetCoverageDir), // ここカンマ区切りで複数指定可能のようだけど、どうもうまくいってない。なので、最大公約数的なパスを一旦指定しておく
@@ -29,16 +31,16 @@ func (c *cmdPHPUnit) build(targetCoverageDir string, testSuiteName string, confi
 		"--configuration",
 		configFile,
 		"--coverage-html",
-		outputCoverageDir,
+		OutputCoverageDir,
 	}...)
 }
 
-func (c *cmdPHPUnit) rawCmd() string {
+func (c *CmdPHPUnit) RawCmd() string {
 	return c.cmd.String()
 }
 
-func (c *cmdPHPUnit) command() tea.Cmd {
+func (c *CmdPHPUnit) Command() tea.Cmd {
 	return tea.ExecProcess(c.cmd, func(err error) tea.Msg {
-		return phpnuitFinishedMsg{err}
+		return PHPUitFinishedMsg{err}
 	})
 }

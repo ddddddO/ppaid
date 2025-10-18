@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -22,7 +23,7 @@ type selectTestFilesView struct {
 }
 
 func newSelectTestFilesView() (*selectTestFilesView, error) {
-	paths, err := getPHPTestFilePaths()
+	paths, err := internal.GetPHPTestFilePaths()
 	if err != nil {
 		return nil, err
 	}
