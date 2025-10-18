@@ -19,6 +19,8 @@ const (
 type model struct {
 	cfg *internal.Config
 
+	height int
+
 	currentView int
 	quitting    bool
 
@@ -64,6 +66,9 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.height = msg.Height
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -130,13 +135,13 @@ func (m model) View() string {
 
 	switch m.currentView {
 	case ViewOfSelectTestFiles:
-		return m.selectTestFilesView.view()
+		return m.selectTestFilesView.view(m.height)
 	case ViewOfSelectCoverageFiles:
-		return m.selectCoverageFilesView.view()
+		return m.selectCoverageFilesView.view(m.height)
 	case ViewOfYesNo:
 		return m.yesnoView.view(m.selectCoverageFilesView)
 	case ViewOfCoverageList:
-		return m.coverageListView.view()
+		return m.coverageListView.view(m.height)
 	default:
 		return "unknown view"
 	}

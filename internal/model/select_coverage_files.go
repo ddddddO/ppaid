@@ -12,6 +12,8 @@ import (
 )
 
 type selectCoverageFilesView struct {
+	height int
+
 	choices         []string      // 選択肢のリスト
 	filteredChoices []fuzzy.Match // 絞り込まれた選択肢のリスト
 
@@ -119,7 +121,7 @@ func (t *selectCoverageFilesView) update(msg tea.Msg, m model) (tea.Model, tea.C
 	return m, cmd
 }
 
-func (t *selectCoverageFilesView) view() string {
+func (t *selectCoverageFilesView) view(viewHeight int) string {
 	var sb strings.Builder
 	sb.WriteString("Select target files you want to coverage (press Space)\n\n")
 	sb.WriteString(t.searchInput.View())
@@ -135,7 +137,11 @@ func (t *selectCoverageFilesView) view() string {
 		}
 	}
 
-	for i, match := range matchs {
+	// マイナスしてるのは、パス一覧を除いた高さを一旦決め打ちした数
+	height := min(len(matchs), viewHeight-7)
+	height = max(0, height) // 起動時、heightがマイナス値になることあってパニックになるから
+
+	for i, match := range matchs[:height] {
 		cursor := " " // no cursor
 		if t.cursor == i {
 			cursor = ">" // cursor!
@@ -148,6 +154,9 @@ func (t *selectCoverageFilesView) view() string {
 
 		// Render the row
 		sb.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, match))
+	}
+	if len(matchs) > height {
+		sb.WriteString(fmt.Sprintf("  ... %d more", len(matchs)-height))
 	}
 
 	// The footer

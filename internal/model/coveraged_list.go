@@ -46,7 +46,7 @@ func (c *coveragedListView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	return m, tea.Quit
 }
 
-func (c *coveragedListView) view() string {
+func (c *coveragedListView) view(viewHeight int) string {
 	s := &strings.Builder{}
 	lvl := 2
 	s.WriteString(fmt.Sprintf("\n\n--- Cveraged file list (Max depth: %d) ---\n\n", lvl+1))
@@ -59,8 +59,8 @@ func (c *coveragedListView) view() string {
 	root := gtree.NewRoot(command.OutputCoverageDir)
 	var node *gtree.Node
 	for i := range coverages {
-		for i, name := range strings.Split(coverages[i], string(filepath.Separator)) {
-			if i == 0 {
+		for j, name := range strings.Split(coverages[i], string(filepath.Separator)) {
+			if j == 0 {
 				node = root
 				continue
 			}
@@ -68,16 +68,27 @@ func (c *coveragedListView) view() string {
 			node = node.Add(name)
 		}
 	}
+	rowCnt := 0
+	height := max(0, viewHeight-15) // 数は一旦決め打ち。phpunit実行時の出力が多いと表示崩れちゃいそうだけど...
 	for iter, err := range gtree.WalkIterFromRoot(root) {
 		if err != nil {
 			panic(err)
 		}
 
+		if rowCnt > height {
+			break
+		}
+
+		rowCnt++
 		if iter.Level() == 1 {
 			s.WriteString(fmt.Sprintf("%s\n", iter.Row()))
 			continue
 		}
 		s.WriteString(fmt.Sprintf("  %s\n", iter.Row()))
+	}
+	if rowCnt > viewHeight {
+		// TODO: ↑の決め打ちの数次第か表示されてない
+		s.WriteString(fmt.Sprintln("  ... more"))
 	}
 	s.WriteString("\n")
 

@@ -11,8 +11,6 @@ import (
 )
 
 type selectTestFilesView struct {
-	height int
-
 	choices         []string      // 選択肢のリスト
 	filteredChoices []fuzzy.Match // 絞り込まれた選択肢のリスト
 
@@ -35,7 +33,6 @@ func newSelectTestFilesView() (*selectTestFilesView, error) {
 	ti.Width = 20
 
 	return &selectTestFilesView{
-		height:          4,
 		choices:         paths,
 		filteredChoices: fuzzy.Find("", paths),
 		selected:        make(map[string]struct{}),
@@ -47,8 +44,6 @@ func (t *selectTestFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) 
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		t.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "up", "k":
@@ -119,7 +114,7 @@ func (t *selectTestFilesView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) 
 	return m, cmd
 }
 
-func (t *selectTestFilesView) view() string {
+func (t *selectTestFilesView) view(viewHeight int) string {
 	var sb strings.Builder
 	sb.WriteString("Select the test files you want to run (press Space)\n\n")
 	sb.WriteString(t.searchInput.View())
@@ -136,7 +131,7 @@ func (t *selectTestFilesView) view() string {
 	}
 
 	// マイナスしてるのは、パス一覧を除いた高さを一旦決め打ちした数
-	height := min(len(matchs), t.height-7)
+	height := min(len(matchs), viewHeight-7)
 	height = max(0, height) // 起動時、heightがマイナス値になることあってパニックになるから
 
 	for i, match := range matchs[:height] {
