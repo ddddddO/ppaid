@@ -18,10 +18,12 @@ type yesnoView struct {
 	cmdPHPUnit *command.CmdPHPUnit
 }
 
-func newYesNoView() (*yesnoView, error) {
+func newYesNoView(commandToSpecifyBeforePHPCommand string) (*yesnoView, error) {
 	return &yesnoView{
-		choices:    []string{"Yes", "No"},
-		cmdPHPUnit: &command.CmdPHPUnit{},
+		choices: []string{"Yes", "No"},
+		cmdPHPUnit: &command.CmdPHPUnit{
+			CommandToSpecifyBeforePHPCommand: commandToSpecifyBeforePHPCommand,
+		},
 	}, nil
 }
 
@@ -55,7 +57,8 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					targetTests = append(targetTests, s)
 				}
 
-				if err := phpunitxml.Generate(targetTests, m.selectCoverageFilesView.longestMatchDirPath()); err != nil {
+				// 微妙
+				if err := phpunitxml.Generate(v.cmdPHPUnit.CommandToSpecifyBeforePHPCommand, targetTests, m.selectCoverageFilesView.longestMatchDirPath()); err != nil {
 					panic(err)
 				}
 

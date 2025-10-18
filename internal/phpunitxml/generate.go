@@ -16,8 +16,8 @@ type phpunitXMLData struct {
 	TargetCoverageDir string
 }
 
-func Generate(targetTests []string, targetCoverageDir string) error {
-	majorVersion, err := command.ParsePHPUnitVersion()
+func Generate(commandToSpecifyBeforePHPCommand string, targetTests []string, targetCoverageDir string) error {
+	majorVersion, err := command.ParsePHPUnitVersion(commandToSpecifyBeforePHPCommand)
 	if err != nil {
 		return err
 	}

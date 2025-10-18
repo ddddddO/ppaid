@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ddddddO/ppaid/internal"
 	"github.com/ddddddO/ppaid/internal/command"
 )
 
@@ -16,6 +17,8 @@ const (
 )
 
 type model struct {
+	cfg *internal.Config
+
 	currentView int
 	quitting    bool
 
@@ -27,7 +30,7 @@ type model struct {
 	err error
 }
 
-func New() (model, error) {
+func New(cfg internal.Config) (model, error) {
 	tfv, err := newSelectTestFilesView()
 	if err != nil {
 		return model{}, err
@@ -38,7 +41,7 @@ func New() (model, error) {
 		return model{}, err
 	}
 
-	ynv, err := newYesNoView()
+	ynv, err := newYesNoView(cfg.CommandToSpecifyBeforePHPCommand)
 	if err != nil {
 		return model{}, err
 	}
