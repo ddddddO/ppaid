@@ -38,8 +38,8 @@ todo: 英語もほしい
 1. 2の最長一致のパス(ディレクトリパス)を計算
 1. 2と3を元に`phpunitxml_generated_by_ppaid.xml`を生成
 1. 実行する`php`コマンドを組み立て、実行する
-    > [!WARNING]
-    > ※`ppaid`初回実行時に、`~/.config/ppaid.toml`という設定ファイルができます。
+    > [!WARNING]<br>
+    > ※`ppaid`初回実行時に、`~/.config/ppaid.toml`という設定ファイルができます。<br> 
     > この設定ファイル内のキー:`CommandToSpecifyBeforePHPCommand`にdockerコマンド越しにphpコマンドを実行するよう記載していますが、直接phpコマンドを実行したい場合は、このキーの値を`""`にしていただくか、この行ごと消してください。
 1. `coverage-ppaid`ディレクトリ配下にカバレッジレポートが生成される
 
