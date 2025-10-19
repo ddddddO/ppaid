@@ -44,18 +44,10 @@ func generatePHPUnitXMLFromExisting(insertData *phpunitXMLData, phpunitMajorVers
 	switch phpunitMajorVersion {
 	case 9:
 		dir := Directory{Suffix: ".php", Content: insertData.TargetCoverageDir}
-		if phpunitXML.Coverage == nil {
-			phpunitXML.Coverage = &Coverage{Include: IncludeExclude{Directories: []Directory{dir}}}
-		} else {
-			phpunitXML.Coverage.Include.Directories = append(phpunitXML.Coverage.Include.Directories, dir)
-		}
+		phpunitXML.Coverage = &Coverage{Include: IncludeExclude{Directories: []Directory{dir}}}
 	case 11:
 		dir := Directory{Suffix: ".php", Content: insertData.TargetCoverageDir}
-		if phpunitXML.Source == nil {
-			phpunitXML.Source = &Source{Include: IncludeExclude{Directories: []Directory{dir}}}
-		} else {
-			phpunitXML.Source.Include.Directories = append(phpunitXML.Source.Include.Directories, dir)
-		}
+		phpunitXML.Source = &Source{Include: IncludeExclude{Directories: []Directory{dir}}}
 	default:
 		if len(insertData.TargetCoverageDir) == 0 {
 			return fmt.Errorf("unsupported PHPUnit version: %d", phpunitMajorVersion)
@@ -98,19 +90,19 @@ type PHPUnitXML struct {
 	XsiNoNamespaceSchemaLocation string `xml:"xsi:noNamespaceSchemaLocation,attr"`
 
 	// --- ルートの属性 ---
-	Bootstrap                           string `xml:"bootstrap,attr"`
-	CacheResult                         string `xml:"cacheResult,attr"`
-	Colors                              string `xml:"colors,attr"`
-	ExecutionOrder                      string `xml:"executionOrder,attr"`
-	FailOnRisky                         string `xml:"failOnRisky,attr"`
-	FailOnWarning                       string `xml:"failOnWarning,attr"`
-	FailOnEmptyTestSuite                string `xml:"failOnEmptyTestSuite,attr"`
-	BeStrictAboutChangesToGlobalState   string `xml:"beStrictAboutChangesToGlobalState,attr"`
-	BeStrictAboutOutputDuringTests      string `xml:"beStrictAboutOutputDuringTests,attr"`
-	CacheDirectory                      string `xml:"cacheDirectory,attr"`
-	BeStrictAboutCoverageMetadata       string `xml:"beStrictAboutCoverageMetadata,attr"`
-	DisplayDetailsOnPhpunitDeprecations string `xml:"displayDetailsOnPhpunitDeprecations,attr"`
-	DisplayDetailsOnIncompleteTests     string `xml:"displayDetailsOnIncompleteTests,attr"`
+	Bootstrap                           string `xml:"bootstrap,attr,omitempty"`
+	CacheResult                         string `xml:"cacheResult,attr,omitempty"`
+	Colors                              string `xml:"colors,attr,omitempty"`
+	ExecutionOrder                      string `xml:"executionOrder,attr,omitempty"`
+	FailOnRisky                         string `xml:"failOnRisky,attr,omitempty"`
+	FailOnWarning                       string `xml:"failOnWarning,attr,omitempty"`
+	FailOnEmptyTestSuite                string `xml:"failOnEmptyTestSuite,attr,omitempty"`
+	BeStrictAboutChangesToGlobalState   string `xml:"beStrictAboutChangesToGlobalState,attr,omitempty"`
+	BeStrictAboutOutputDuringTests      string `xml:"beStrictAboutOutputDuringTests,attr,omitempty"`
+	CacheDirectory                      string `xml:"cacheDirectory,attr,omitempty"`
+	BeStrictAboutCoverageMetadata       string `xml:"beStrictAboutCoverageMetadata,attr,omitempty"`
+	DisplayDetailsOnPhpunitDeprecations string `xml:"displayDetailsOnPhpunitDeprecations,attr,omitempty"`
+	DisplayDetailsOnIncompleteTests     string `xml:"displayDetailsOnIncompleteTests,attr,omitempty"`
 	StopOnFailure                       string `xml:"stopOnFailure,attr,omitempty"`
 	// 他の多くの属性を必要に応じてここに追加
 
