@@ -6,6 +6,9 @@ This tool might be useful in such situations.
 
 ![](./assets/ppaid_demo.gif)
 
+> [!IMPORTANT] 
+> `vendor/bin/phpunit` and `pcov` are required.
+
 ## With this tool,
 1. Select test files to run,
 1. Select files for which you want to generate coverage reports (HTML),
@@ -17,7 +20,7 @@ Files located in `tests/` directory.
 ## Which files can be selected to get coverage?
 Files located in `src/` or `app/` directory.
 
-## Install
+## How to install?
 
 ### Homebrew
 
@@ -28,6 +31,23 @@ brew install ddddddO/tap/ppaid
 ### Go
 ```console
 go install github.com/ddddddO/ppaid/cmd/ppaid@latest
+```
+
+## Usage
+
+```console
+$ ppaid --help
+Usage: ppaid [options]
+ppaid
+
+Options:
+  -repeat
+        This flag starts with data selected by the most recently executed ppaid.
+
+Example:
+  ppaid          # normal launch
+  ppaid --repeat # launch using the most recent data
+$
 ```
 
 ## Processing of PP-Aid
@@ -49,3 +69,4 @@ todo: 英語もほしい
 - [ ] カバレッジレポートをHTML形式以外でも出力できるようにする
 - [ ] ヒストリー機能欲しい
     - 何度もファイル選択は手間。ただ、ツールで組み立てられたコマンドは表示されるので、それコピペで実行でも代替できるから後でいいかも
+    - 一旦repeatフラグを実装したから、ほんとに欲しくなってからでいいかも

@@ -33,13 +33,13 @@ type model struct {
 	err error
 }
 
-func New(cfg internal.Config) (model, error) {
-	tfv, err := newSelectTestFilesView()
+func New(cfg internal.Config, shouldRestoreLatestExecutedData bool) (model, error) {
+	tfv, err := newSelectTestFilesView(cfg, shouldRestoreLatestExecutedData)
 	if err != nil {
 		return model{}, err
 	}
 
-	cfv, err := newSelectCoverageFilesView()
+	cfv, err := newSelectCoverageFilesView(cfg, shouldRestoreLatestExecutedData)
 	if err != nil {
 		return model{}, err
 	}

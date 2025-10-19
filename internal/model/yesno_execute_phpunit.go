@@ -40,7 +40,28 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			v.selected = v.choices[v.cursor]
 
 			if v.selected == "Yes" {
-				// TODO: 一旦ここに置くだけ
+				targetTests := []string{}
+				for s := range m.selectTestFilesView.selected {
+					targetTests = append(targetTests, s)
+				}
+				targetCoverages := []string{}
+				for s := range m.selectCoverageFilesView.selected {
+					targetCoverages = append(targetCoverages, s)
+				}
+				cfg := internal.Config{
+					CommandToSpecifyBeforePHPCommand: v.cmdPHPUnit.CommandToSpecifyBeforePHPCommand,
+					LatestExecutedData: struct {
+						SelectedTestFilePaths       []string
+						SelectedCoverageTargetPaths []string
+					}{
+						SelectedTestFilePaths:       targetTests,
+						SelectedCoverageTargetPaths: targetCoverages,
+					},
+				}
+				if err := internal.StoreConfig(cfg); err != nil {
+					panic(err)
+				}
+
 				if err := os.RemoveAll(command.OutputCoverageDir); err != nil {
 					panic(err)
 				}
@@ -52,11 +73,6 @@ func (v *yesnoView) update(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					if !os.IsNotExist(err) {
 						panic(err)
 					}
-				}
-
-				targetTests := []string{}
-				for s := range m.selectTestFilesView.selected {
-					targetTests = append(targetTests, s)
 				}
 
 				// 微妙
@@ -131,11 +147,7 @@ func splitStringByN(s string, n int) ([]string, error) {
 	var chunks []string
 	for i := 0; i < len(runes); i += n {
 		start := i
-		end := i + n
-
-		if end > len(runes) {
-			end = len(runes)
-		}
+		end := min(i+n, len(runes))
 
 		chunk := string(runes[start:end])
 		chunks = append(chunks, chunk)
