@@ -14,7 +14,7 @@ This tool might be useful in such situations.
 ## Which test files can be selected?
 Files located in `tests/` directory.
 
-## What files can be selected to get coverage?
+## Which files can be selected to get coverage?
 Files located in `src/` or `app/` directory.
 
 ## Install
@@ -36,6 +36,7 @@ todo: 英語もほしい
 1. 選択されたテストファイルのパスを取得(複数可)
 1. 選択されたカバレッジレポートを生成したいファイルのパスを取得(複数可)
 1. 2の最長一致のパス(ディレクトリパス)を計算
+    - ※このディレクトリパスの配下がカバレッジ生成の対象なので、2で選択された各ファイルパスのみがカバレッジ生成対象ではないことに注意
 1. 2と3を元に`phpunitxml_generated_by_ppaid.xml`を生成
 1. 実行する`php`コマンドを組み立て、実行する
 1. `coverage-ppaid`ディレクトリ配下にカバレッジレポートが生成される
