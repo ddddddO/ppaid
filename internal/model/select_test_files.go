@@ -20,7 +20,7 @@ type selectTestFilesView struct {
 	selected map[string]struct{}
 }
 
-func newSelectTestFilesView() (*selectTestFilesView, error) {
+func newSelectTestFilesView(cfg internal.Config, shouldRestoreLatestExecutedData bool) (*selectTestFilesView, error) {
 	paths, err := internal.GetPHPTestFilePaths()
 	if err != nil {
 		return nil, err
@@ -32,10 +32,19 @@ func newSelectTestFilesView() (*selectTestFilesView, error) {
 	ti.CharLimit = 156
 	ti.Width = 20
 
+	selected := make(map[string]struct{})
+	if shouldRestoreLatestExecutedData {
+		for i := range paths {
+			if cfg.IsMatchedTestFile(paths[i]) {
+				selected[paths[i]] = struct{}{}
+			}
+		}
+	}
+
 	return &selectTestFilesView{
 		choices:         paths,
 		filteredChoices: fuzzy.Find("", paths),
-		selected:        make(map[string]struct{}),
+		selected:        selected,
 		searchInput:     ti,
 	}, nil
 }

@@ -23,7 +23,7 @@ type selectCoverageFilesView struct {
 	selected map[string]struct{}
 }
 
-func newSelectCoverageFilesView() (*selectCoverageFilesView, error) {
+func newSelectCoverageFilesView(cfg internal.Config, shouldRestoreLatestExecutedData bool) (*selectCoverageFilesView, error) {
 	paths, err := internal.GetPHPCodeFilePaths()
 	if err != nil {
 		return nil, err
@@ -35,14 +35,19 @@ func newSelectCoverageFilesView() (*selectCoverageFilesView, error) {
 	ti.CharLimit = 156
 	ti.Width = 20
 
-	// TODO: 多分ここで、選択されたカバレッジ取りたいファイルパスをマージして、最大公約数的なパスを算出して以下に設定できればよさそうな気がする？
-	// - pcov.directory=
-	// - phpunit.xmlの <coverage> or <source> or <filter> ...?
+	selected := make(map[string]struct{})
+	if shouldRestoreLatestExecutedData {
+		for i := range paths {
+			if cfg.IsMatchedCoverageTargetFile(paths[i]) {
+				selected[paths[i]] = struct{}{}
+			}
+		}
+	}
 
 	return &selectCoverageFilesView{
 		choices:         paths,
 		filteredChoices: fuzzy.Find("", paths),
-		selected:        make(map[string]struct{}),
+		selected:        selected,
 		searchInput:     ti,
 	}, nil
 }
