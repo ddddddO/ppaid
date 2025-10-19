@@ -1,6 +1,7 @@
 package phpunitxml
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"text/template"
@@ -17,8 +18,20 @@ type phpunitXMLData struct {
 }
 
 func Generate(commandToSpecifyBeforePHPCommand string, targetTests []string, targetCoverageDir string) error {
+	insertData := &phpunitXMLData{
+		TestSuiteName:     "PPAID",
+		TargetTestFiles:   targetTests,
+		TargetCoverageDir: targetCoverageDir,
+	}
+
 	majorVersion, err := command.ParsePHPUnitVersion(commandToSpecifyBeforePHPCommand)
 	if err != nil {
+		return err
+	}
+
+	if err := generatePHPUnitXMLFromExisting(insertData, majorVersion); err == nil {
+		return nil
+	} else if !errors.Is(err, &ErrReadPHPUnitXML{}) {
 		return err
 	}
 
@@ -38,9 +51,5 @@ func Generate(commandToSpecifyBeforePHPCommand string, targetTests []string, tar
 	}
 	defer f.Close()
 
-	return t.Execute(f, &phpunitXMLData{
-		TestSuiteName:     "PPAID",
-		TargetTestFiles:   targetTests,
-		TargetCoverageDir: targetCoverageDir,
-	})
+	return t.Execute(f, insertData)
 }
