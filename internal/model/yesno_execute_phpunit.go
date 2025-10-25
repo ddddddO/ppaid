@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/ddddddO/ppaid/internal"
-	"github.com/ddddddO/ppaid/internal/command"
-	"github.com/ddddddO/ppaid/internal/phpunitxml"
+	"github.com/ddddddO/puco/internal"
+	"github.com/ddddddO/puco/internal/command"
+	"github.com/ddddddO/puco/internal/phpunitxml"
 )
 
 type yesnoView struct {
@@ -107,7 +107,7 @@ func (v *yesnoView) view(width int, cfv *selectCoverageFilesView) string {
 	s := strings.Builder{}
 	s.WriteString(fmt.Sprintf("%s\n\n", internal.ColorLightPinkStyle.Render("Execute PHPUnit?")))
 
-	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PPAID", phpunitxml.OutputPHPUnitXML)
+	v.cmdPHPUnit.Build(cfv.longestMatchDirPath(), "PUCO", phpunitxml.OutputPHPUnitXML)
 
 	rawCmd := v.cmdPHPUnit.RawCmd()
 	if len(rawCmd) <= width {

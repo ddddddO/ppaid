@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/ddddddO/ppaid/internal/command"
+	"github.com/ddddddO/puco/internal/command"
 )
 
 func GetPHPTestFilePaths() ([]string, error) {

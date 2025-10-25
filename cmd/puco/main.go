@@ -6,16 +6,16 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/ddddddO/ppaid/internal"
-	"github.com/ddddddO/ppaid/internal/model"
+	"github.com/ddddddO/puco/internal"
+	"github.com/ddddddO/puco/internal/model"
 )
 
 func main() {
 	var shouldRestoreLatestExecutedData bool
-	flag.BoolVar(&shouldRestoreLatestExecutedData, "repeat", false, "This flag starts with data selected by the most recently executed ppaid.")
+	flag.BoolVar(&shouldRestoreLatestExecutedData, "repeat", false, "This flag starts with data selected by the most recently executed puco.")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
-		fmt.Fprintln(os.Stderr, "ppaid")
+		fmt.Fprintln(os.Stderr, "puco")
 		fmt.Fprintln(os.Stderr, "\nOptions:")
 
 		flag.PrintDefaults()

@@ -1,8 +1,8 @@
 build:
-	go build -o ppaid cmd/ppaid/*.go
+	go build -o puco cmd/puco/*.go
 
 deploy: build
-	mv ppaid $(HOME)/go/bin/
+	mv puco $(HOME)/go/bin/
 
 credit:
 	gocredits . > CREDITS

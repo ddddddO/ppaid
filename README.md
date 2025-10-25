@@ -1,10 +1,10 @@
-# 💊PP-Aid
-Tool that **aid**s **P**HPUnit and **P**COV (pronounced /piːpiːeɪd/)
+# 💊PuCo
+Tool that aids **P**HP**U**nit and P**CO**V
 
 Running tests takes a lot of time, and generating test coverage also takes a significant amount of time.
 This tool might be useful in such situations.
 
-![](./assets/ppaid_demo.gif)
+![](./assets/puco_demo.gif)
 
 > [!IMPORTANT] 
 > `vendor/bin/phpunit` and `pcov` are required.
@@ -25,44 +25,44 @@ Files located in `src/` or `app/` directory.
 ### Homebrew
 
 ```console
-brew install ddddddO/tap/ppaid
+brew install ddddddO/tap/puco
 ```
 
 ### Go
 ```console
-go install github.com/ddddddO/ppaid/cmd/ppaid@latest
+go install github.com/ddddddO/puco/cmd/puco@latest
 ```
 
 ## Usage
 
 ```console
-$ ppaid --help
-Usage: ppaid [options]
-ppaid
+$ puco --help
+Usage: puco [options]
+puco
 
 Options:
   -repeat
-        This flag starts with data selected by the most recently executed ppaid.
+        This flag starts with data selected by the most recently executed puco.
 
 Example:
-  ppaid          # normal launch
-  ppaid --repeat # launch using the most recent data
+  puco          # normal launch
+  puco --repeat # launch using the most recent data
 $
 ```
 
-## Processing of PP-Aid
+## Processing of PuCo
 todo: 英語もほしい
 
 1. 選択されたテストファイルのパスを取得(複数可)
 1. 選択されたカバレッジレポートを生成したいファイルのパスを取得(複数可)
 1. 2の最長一致のパス(ディレクトリパス)を計算
     - ※このディレクトリパスの配下がカバレッジ生成の対象なので、2で選択された各ファイルパスのみがカバレッジ生成対象ではないことに注意
-1. 1と3と既存の`phpunit.xml`があれば、それらを元に`phpunitxml_generated_by_ppaid.xml`を生成
+1. 1と3と既存の`phpunit.xml`があれば、それらを元に`phpunitxml_generated_by_puco.xml`を生成
 1. 実行する`php`コマンドを組み立て、実行する
-1. `coverage-ppaid`ディレクトリ配下にカバレッジレポートが生成される
+1. `coverage-puco`ディレクトリ配下にカバレッジレポートが生成される
 
 > [!WARNING]
-> ※`ppaid`初回実行時に、`~/.config/ppaid.toml`という設定ファイルができます。
+> ※`puco`初回実行時に、`~/.config/puco.toml`という設定ファイルができます。
 > この設定ファイル内のキー:`CommandToSpecifyBeforePHPCommand`にdockerコマンド越しにphpコマンドを実行するよう記載していますが、直接phpコマンドを実行したい場合は、このキーの値を`""`にしていただくか、この行ごと消してください。
 
 ## TODO

@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/ddddddO/ppaid/internal"
+	"github.com/ddddddO/puco/internal"
 	"github.com/sahilm/fuzzy"
 )
 

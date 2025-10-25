@@ -6,10 +6,10 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/ddddddO/ppaid/internal/command"
+	"github.com/ddddddO/puco/internal/command"
 )
 
-const OutputPHPUnitXML = "phpunitxml_generated_by_ppaid.xml"
+const OutputPHPUnitXML = "phpunitxml_generated_by_puco.xml"
 
 type phpunitXMLData struct {
 	TestSuiteName     string
@@ -19,7 +19,7 @@ type phpunitXMLData struct {
 
 func Generate(commandToSpecifyBeforePHPCommand string, targetTests []string, targetCoverageDir string) error {
 	insertData := &phpunitXMLData{
-		TestSuiteName:     "PPAID",
+		TestSuiteName:     "PUCO",
 		TargetTestFiles:   targetTests,
 		TargetCoverageDir: targetCoverageDir,
 	}

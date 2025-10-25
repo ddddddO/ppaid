@@ -1,13 +1,13 @@
 version: 2
-project_name: ppaid
+project_name: puco
 env:
   - GO111MODULE=on
 before:
   hooks:
     - go mod tidy
 builds:
-  - main: ./cmd/ppaid
-    binary: ppaid
+  - main: ./cmd/puco
+    binary: puco
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
@@ -17,9 +17,9 @@ builds:
       - windows
     env:
       - CGO_ENABLED=0
-  - id: ppaid-linux
-    main: ./cmd/ppaid
-    binary: ppaid
+  - id: puco-linux
+    main: ./cmd/puco
+    binary: puco
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
@@ -44,6 +44,6 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     directory: Formula
-    homepage: "https://github.com/ddddddO/ppaid"
+    homepage: "https://github.com/ddddddO/puco"
     description: "Tool that aids PHPUnit and PCOV"
     license: "BSD-2-Clause"

@@ -21,7 +21,7 @@ type CmdPHPUnit struct {
 	cmd                              *exec.Cmd
 }
 
-const OutputCoverageDir = "coverage-ppaid"
+const OutputCoverageDir = "coverage-puco"
 
 // TODO: test/coverage以外の、-d memory_limit指定は、設定ファイルから受け取るようにする
 func (c *CmdPHPUnit) Build(targetCoverageDir string, testSuiteName string, configFile string) {

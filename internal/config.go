@@ -14,7 +14,7 @@ type Config struct {
 	// 実行されるphpコマンドの前に指定するコマンドを設定
 	CommandToSpecifyBeforePHPCommand string
 
-	// 直前に実行されたppaidで選択されたテストファイルパスとカバレッジ対象のパスを残す
+	// 直前に実行されたpucoで選択されたテストファイルパスとカバレッジ対象のパスを残す
 	// 設定ファイルに微妙な感じだけど...あと、プロジェクト関係なくなのを何とかしたい気もする
 	LatestExecutedData struct {
 		SelectedTestFilePaths       []string
@@ -37,7 +37,7 @@ func LoadConfig() (Config, error) {
 	if err != nil {
 		return config, err
 	}
-	ConfigFilePath = filepath.Join(homeDir, ".config", "ppaid.toml")
+	ConfigFilePath = filepath.Join(homeDir, ".config", "puco.toml")
 	if _, err := os.Stat(ConfigFilePath); os.IsNotExist(err) {
 		file, err := os.Create(ConfigFilePath)
 		if err != nil {
