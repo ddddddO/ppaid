@@ -47,16 +47,41 @@ Options:
 Example:
   puco          # normal launch
   puco --repeat # launch using the most recent data
+
+Processing description:
+  1. You can select multiple test files to run (fuzzy search available).
+  2. You can select multiple PHP files for which you want to calculate coverage (fuzzy search available).
+  3. Calculate the longest matching directory path from multiple selected PHP file paths in step 2
+    - ※ Note that only the PHP file paths selected in step 2 are not the target for coverage calculation. Instead, the directory path under the longest match calculated becomes the target for coverage calculation. If there are numerous PHP files under the calculated directory path, the coverage calculation process may become slow.
+  4. If Steps 1 and 3 and an existing phpunit.xml are present, generate phpunitxml_generated_by_puco.xml based on them.
+  5. Assemble and execute the php command.
+  6. Coverage reports are generated under the coverage-puco directory.
+
+WARNING:
+  When puco is run for the first time, a configuration file named ~/.config/puco.toml is created. This configuration file contains a key: CommandToSpecifyBeforePHPCommand. It specifies that the PHP command should be executed via the Docker command. If you wish to execute the PHP command directly, please set the value of this key to "" or delete this entire line.
 $
 ```
 
-## Processing of PuCo
-todo: 英語もほしい
+## Processing of PuCo (en)
 
-1. 選択されたテストファイルのパスを取得(複数可)
-1. 選択されたカバレッジレポートを生成したいファイルのパスを取得(複数可)
-1. 2の最長一致のパス(ディレクトリパス)を計算
-    - ※このディレクトリパスの配下がカバレッジ生成の対象なので、2で選択された各ファイルパスのみがカバレッジ生成対象ではないことに注意
+1. You can select multiple test files to run (fuzzy search available).
+1. You can select multiple PHP files for which you want to calculate coverage (fuzzy search available).
+1. Calculate the longest matching directory path from multiple selected PHP file paths in step 2
+    - ※ Note that only the PHP file paths selected in step 2 are not the target for coverage calculation. Instead, the directory path under the longest match calculated becomes the target for coverage calculation. **If there are numerous PHP files under the calculated directory path, the coverage calculation process may become slow.**
+1. If Steps 1 and 3 and an existing `phpunit.xml` are present, generate `phpunitxml_generated_by_puco.xml` based on them.
+1. Assemble and execute the `php` command.
+1. Coverage reports are generated under the `coverage-puco` directory.
+
+> [!WARNING]
+> ※ When `puco` is run for the first time, a configuration file named `~/.config/puco.toml` is created.
+> This configuration file contains a key: `CommandToSpecifyBeforePHPCommand`. It specifies that the PHP command should be executed via the Docker command. If you wish to execute the PHP command directly, please set the value of this key to `""` or delete this entire line.
+
+<details><summary>Processing of PuCo (ja)</summary>
+
+1. 実行したいテストファイルを複数選択できます（fuzzyに検索可能）
+1. カバレッジを算出したいPHPファイルを複数選択できます（fuzzyに検索可能）
+1. 2で複数選択されたPHPファイルパスから最長一致のディレクトリパスを計算
+    - ※ 2で選択された各PHPファイルパスのみがカバレッジ計算対象では無く、算出された最長一致のディレクトリパス配下がカバレッジ算出対象になることに注意してください。**算出されるディレクトリ配下に多数のPHPファイルがある場合、カバレッジ計算処理が遅くなるかもしれません。**
 1. 1と3と既存の`phpunit.xml`があれば、それらを元に`phpunitxml_generated_by_puco.xml`を生成
 1. 実行する`php`コマンドを組み立て、実行する
 1. `coverage-puco`ディレクトリ配下にカバレッジレポートが生成される
@@ -64,6 +89,8 @@ todo: 英語もほしい
 > [!WARNING]
 > ※`puco`初回実行時に、`~/.config/puco.toml`という設定ファイルができます。
 > この設定ファイル内のキー:`CommandToSpecifyBeforePHPCommand`にdockerコマンド越しにphpコマンドを実行するよう記載していますが、直接phpコマンドを実行したい場合は、このキーの値を`""`にしていただくか、この行ごと消してください。
+
+</details>
 
 ## TODO
 - [ ] カバレッジレポートをHTML形式以外でも出力できるようにする
